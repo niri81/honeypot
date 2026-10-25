@@ -4,7 +4,7 @@ from pathlib import Path
 
 def container_get_id_by_name(name: str):
     output = subprocess.run(
-        ["docker", "ps", "--format", '"{{.Id}} {{.Name}}"'],
+        ["docker", "ps", "--format", '"{{.ID}} {{.Name}}"'],
         check=True,
         capture_output=True,
         text=True,
