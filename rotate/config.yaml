@@ -1,6 +1,9 @@
 container_name: # Add container name here
 compose_file_path: # Add path to folder containing compose file here
 
+log_path: # Add folder containing logs here
+output_path: # Add folder for tar archive containing filesystem and logs here
+
 notifiers:
   # Add notifier here
 
