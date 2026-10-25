@@ -26,7 +26,7 @@ def rotate(config: Config):
 
     diff = container_diff_against_baseline(container_id, config.get("baseline"))
     logger.info(f"Diff between container and baseline is: {json.dumps(diff)}")
-    if diff.values():
+    if any(diff.values()):
         notifier = Notifier(config.get("notifiers"))
         notifier.notify("Diff Detected", json.dumps(diff))
 
