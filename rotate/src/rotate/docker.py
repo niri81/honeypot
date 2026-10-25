@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 
 
 def container_get_id_by_name(name: str):
@@ -55,3 +56,11 @@ def _container_diff_output_to_dict(output: str) -> dict[str, list[str]]:
 
 def container_export_by_id(id: str, output_dir: str):
     subprocess.run(["docker", "export", "-o", output_dir, id], check=True)
+
+
+def recreate_container_compose(name: str, compose_file_path: str | Path):
+    subprocess.run(
+        ["docker", "compose", "up", "-d", "--force-recreate", name],
+        check=True,
+        cwd=compose_file_path,
+    )
