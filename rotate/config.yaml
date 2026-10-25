@@ -1,3 +1,6 @@
+container_name: # Add container name here
+compose_file_path: # Add path to folder containing compose file here
+
 notifiers:
   # Add notifier here
 
