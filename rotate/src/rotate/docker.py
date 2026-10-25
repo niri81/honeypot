@@ -58,9 +58,13 @@ def container_export_by_id(id: str, output_dir: Path):
     subprocess.run(["docker", "export", "-o", output_dir, id], check=True)
 
 
-def recreate_container_compose(name: str, compose_file_path: Path):
+def container_compose_down(compose_file_path: Path):
+    subprocess.run(["docker", "compose", "down"], check=True, cwd=compose_file_path)
+
+
+def container_compose_up(compose_file_path: Path):
     subprocess.run(
-        ["docker", "compose", "up", "-d", "--force-recreate", name],
+        ["docker", "compose", "up", "-d", "--force-recreate"],
         check=True,
         cwd=compose_file_path,
     )
