@@ -14,3 +14,7 @@ def save_logs_and_fs(log_path: Path, output_path: Path):
         ],
         check=True,
     )
+
+
+def delete_logs(log_path: Path):
+    subprocess.run(["rm", "-rf", log_path], check=True)
