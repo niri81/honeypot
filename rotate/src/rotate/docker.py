@@ -15,7 +15,24 @@ def container_get_id_by_name(name: str):
     raise ValueError("No container found matching given name")
 
 
-def container_diff(id: str) -> dict[str, list[str]]:
+def container_diff_against_baseline(id: str, baseline: str) -> dict[str, list[str]]:
+    container_diff_dict = _container_diff(id)
+    baseline_dict = _container_diff_output_to_dict(baseline)
+
+    return _diff_change_set(container_diff_dict, baseline_dict)
+
+
+def _diff_change_set(a, b):
+    result = {"added": [], "modified": [], "removed": []}
+    for key in result:
+        items_a = set(a.get(key, []))
+        items_b = set(b.get(key, []))
+
+        result[key] = list(items_a - items_b)
+    return result
+
+
+def _container_diff(id: str) -> dict[str, list[str]]:
     output = subprocess.run(
         ["docker", "diff", id], check=True, capture_output=True, text=True
     )
