@@ -12,9 +12,10 @@ def save_logs_and_fs(log_path: Path, output_path: Path):
         [
             "tar",
             "czf",
-            output_path / datetime.now().isoformat(),
+            output_path / (datetime.now().strftime("%y-%m-%dT%H-%M-%S") + ".tar.gz"),
             "--directory",
             log_path,
+            ".",
         ],
         check=True,
     )
