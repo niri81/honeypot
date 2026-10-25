@@ -1,4 +1,5 @@
 import json
+import logging
 
 from rotate.config import Config
 from rotate.docker import (
@@ -12,6 +13,8 @@ from rotate.logs import delete_logs, save_logs_and_fs
 from rotate.notification import Notifier
 from rotate.utils import construct_path
 
+logger = logging.getLogger(__name__)
+
 
 def rotate(config: Config):
     container_name = config.get("container_name")
@@ -22,6 +25,7 @@ def rotate(config: Config):
     log_path = construct_path(config.get("log_path"))
 
     diff = container_diff_against_baseline(container_id, config.get("baseline"))
+    logger.info(f"Diff between container and baseline is: {json.dumps(diff)}")
     if diff.values():
         notifier = Notifier(config.get("notifiers"))
         notifier.notify("Diff Detected", json.dumps(diff))
