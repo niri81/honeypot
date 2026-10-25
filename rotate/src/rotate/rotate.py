@@ -32,7 +32,7 @@ def rotate(config: Config):
 
         container_export_by_id(
             container_id,
-            output_dir=log_path / "container_fs",
+            output_dir=log_path / "container_fs.tar",
         )
 
         save_logs_and_fs(log_path, construct_path(config.get("output_path")))
