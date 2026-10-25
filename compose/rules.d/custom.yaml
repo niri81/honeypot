@@ -1,0 +1,53 @@
+- macro: honeypot_container
+  condition: container.image contains php
+
+- macro: open_write
+  condition: >
+    (evt.type=open or evt.type=openat) and
+    fd.typechar='f' and
+    (evt.arg.flags contains O_WRONLY or
+    evt.arg.flags contains O_RDWR or
+    evt.arg.flags contains O_CREAT or
+    evt.arg.flags contains O_TRUNC)
+
+- list: rfc_1918_addresses
+  items: ['"10.0.0.0/8"', '"172.16.0.0/12"', '"192.168.0.0/16"']
+
+- rule: Detect Shell Spawn in PHP Honeypot
+  desc: Detects when a shell or unexpected binary is executed inside the honeypot container (Potential RCE).
+  condition: >
+    honeypot_container and
+    evt.type = execve and
+    proc.name in (sh, bash, dash, wget, curl, nc, python, python3, perl, ruby, php)
+  output: "HONEYPOT_RCE: user=%user.name command=%proc.cmdline container_id=%container.id container_name=%container.name image=%container.image.repository"
+  priority: CRITICAL
+  tags: [rce, honeypot, attack]
+
+- rule: Log All Container Activity
+  desc: Captures and logs every system call executed inside the vulnerable honeypot container
+  condition: honeypot_container and evt.type=execve
+  output: "HONEYPOT_AUDIT: syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  priority: INFO
+  tags: [audit, honeypot, full_telemetry]
+
+- rule: Detect Outgoing Connections from Honeypot
+  desc: Detects all outgoing connections from honeypot container
+  condition: >
+    honeypot_container and
+    evt.type=connect and
+    not (fd.snet in (rfc_1918_addresses)) and
+    fd.lip exists and
+    not (fd.typechar="4" and fd.lip="0.0.0.0" and fd.sip="0.0.0.0" and fd.lport=0 and fd.sport=0)
+  output: "HONEYPOT_AUDIT: from=%fd.lip:%fd.lport to=%fd.sip:%fd.sport proto=%fd.l4proto role=%fd.proto syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  priority: NOTICE
+  tags: [honeypot, attack, network]
+
+- rule: File Creation in /tmp/
+  desc: Detects file creations in /tmp/ directory
+  condition: >
+    honeypot_container and
+    open_write and 
+    (fs.path.name startswith "/tmp/" or fd.name startswith "/tmp/")
+  output: "HONEYPOT_TMP_FILE: file=%fd.name path=%fs.path.name syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  priority: WARNING
+  tags: [filesystem, tmp]
