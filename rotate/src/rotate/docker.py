@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def container_get_id_by_name(name: str):
     logger.info(f"Resolving container with name: {name}")
     output = subprocess.run(
-        ["docker", "ps", "--format", '"{{.ID}} {{.Name}}"'],
+        ["docker", "ps", "--format", "{{.ID}} {{.Names}}"],
         check=True,
         capture_output=True,
         text=True,
