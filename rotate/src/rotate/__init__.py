@@ -14,7 +14,6 @@ def main() -> None:
     logger = logging.getLogger(__name__)
 
     config = Config.from_yaml(construct_path("config.yaml"))
-    notifier = Notifier(config.get("notifiers"))
     logger.info("Loaded config")
 
     rotate(config)
