@@ -1,4 +1,8 @@
+import logging
+
 import apprise
+
+logger = logging.getLogger(__name__)
 
 
 class Notifier:
@@ -8,4 +12,5 @@ class Notifier:
             self.notifier.add(line)
 
     def notify(self, title: str, body: str):
+        logger.info("Sending notification")
         self.notifier.notify(title=title, body=body)
