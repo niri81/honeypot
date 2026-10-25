@@ -54,11 +54,11 @@ def _container_diff_output_to_dict(output: str) -> dict[str, list[str]]:
     return diff_dict
 
 
-def container_export_by_id(id: str, output_dir: str):
+def container_export_by_id(id: str, output_dir: Path):
     subprocess.run(["docker", "export", "-o", output_dir, id], check=True)
 
 
-def recreate_container_compose(name: str, compose_file_path: str | Path):
+def recreate_container_compose(name: str, compose_file_path: Path):
     subprocess.run(
         ["docker", "compose", "up", "-d", "--force-recreate", name],
         check=True,
