@@ -7,7 +7,9 @@ authors = [
     { name = "niri81", email = "38499069+niri81@users.noreply.github.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "apprise>=2.1.0",
+]
 
 [project.scripts]
 rotate = "rotate:main"
