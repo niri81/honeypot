@@ -1,2 +1,5 @@
+from rotate.config import Config
+
+
 def main() -> None:
-    print("Hello from rotate!")
+    config = Config.from_yaml("config.yaml")
