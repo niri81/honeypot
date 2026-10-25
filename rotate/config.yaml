@@ -1,2 +1,5 @@
 notifiers:
   # Add notifier here
+
+baseline:
+  # Add baseline here, use | and paste `docker diff` output
