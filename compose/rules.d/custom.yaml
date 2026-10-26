@@ -26,7 +26,7 @@
 - rule: Log All Container Activity
   desc: Captures and logs every system call executed inside the vulnerable honeypot container
   condition: honeypot_container and evt.type=execve
-  output: "HONEYPOT_AUDIT: syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  output: "HONEYPOT_AUDIT: syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container_id=%container.id container=%container.name"
   priority: INFO
   tags: [audit, honeypot, full_telemetry]
 
@@ -38,7 +38,7 @@
     not (fd.snet in (rfc_1918_addresses)) and
     fd.lip exists and
     not (fd.typechar="4" and fd.lip="0.0.0.0" and fd.sip="0.0.0.0" and fd.lport=0 and fd.sport=0)
-  output: "HONEYPOT_AUDIT: from=%fd.lip:%fd.lport to=%fd.sip:%fd.sport proto=%fd.l4proto role=%fd.proto syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  output: "HONEYPOT_AUDIT: from=%fd.lip:%fd.lport to=%fd.sip:%fd.sport proto=%fd.l4proto role=%fd.proto syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container_id=%container.id container=%container.name"
   priority: NOTICE
   tags: [honeypot, attack, network]
 
@@ -48,6 +48,6 @@
     honeypot_container and
     open_write and
     (fs.path.name startswith "/tmp/" or fd.name startswith "/tmp/")
-  output: "HONEYPOT_TMP_FILE: file=%fd.name path=%fs.path.name syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
+  output: "HONEYPOT_TMP_FILE: file=%fd.name path=%fs.path.name syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container_id=%container.id container=%container.name"
   priority: WARNING
   tags: [filesystem, tmp]
