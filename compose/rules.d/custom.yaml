@@ -1,5 +1,5 @@
 - macro: honeypot_container
-  condition: container.image contains php
+  condition: container.name contains vulnerable
 
 - macro: open_write
   condition: >
@@ -19,7 +19,7 @@
     honeypot_container and
     evt.type = execve and
     proc.name in (sh, bash, dash, wget, curl, nc, python, python3, perl, ruby, php)
-  output: "HONEYPOT_RCE: user=%user.name command=%proc.cmdline container_id=%container.id container_name=%container.name image=%container.image.repository"
+  output: "HONEYPOT_RCE: user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container_id=%container.id container_name=%container.name image=%container.image.repository"
   priority: CRITICAL
   tags: [rce, honeypot, attack]
 
@@ -46,7 +46,7 @@
   desc: Detects file creations in /tmp/ directory
   condition: >
     honeypot_container and
-    open_write and 
+    open_write and
     (fs.path.name startswith "/tmp/" or fd.name startswith "/tmp/")
   output: "HONEYPOT_TMP_FILE: file=%fd.name path=%fs.path.name syscall=%evt.type user=%user.name command=%proc.cmdline process=%proc.name pprocess=%proc.pname container=%container.name"
   priority: WARNING

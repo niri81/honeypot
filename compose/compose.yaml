@@ -1,19 +1,19 @@
-services:
-  tcpdump: &base_dump
-    image: alpine:latest
-    command: >
-      sh -c "apk add --no-cache tcpdump &&
-             tcpdump -i any -w /captures/${PREFIX}traffic_$$(date +%s).pcap"
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    volumes:
-      - /tmp/logs/tcpdump:/captures
-    restart: unless-stopped
-    network_mode: "service:tbd"
+x-tcpdump: &base_dump
+  image: alpine:latest
+  command: >
+    sh -c "apk add --no-cache tcpdump &&
+      tcpdump -i any -w /captures/$${PREFIX}traffic_$$(date +%s).pcap"
+  cap_drop:
+    - ALL
+  cap_add:
+    - NET_ADMIN
+    - NET_RAW
+  volumes:
+    - /tmp/logs/tcpdump:/captures
+  restart: unless-stopped
+  network_mode: "service:tbd"
 
+services:
   falco:
     image: docker.io/falcosecurity/falco:latest
     cap_drop:
@@ -48,6 +48,23 @@ services:
     environment:
       PREFIX: php_
 
+  vulnerable-node:
+    build:
+      context: ../node2shell
+    ports:
+      - 0.0.0.0:8080:8080
+    restart: unless-stopped
+    networks:
+      - vulnerable-node
+
+  tcpdump-node:
+    <<: *base_dump
+    network_mode: service:vulnerable-node
+    environment:
+      PREFIX: node_
+
 networks:
   vulnerable-php:
+    driver: bridge
+  vulnerable-node:
     driver: bridge

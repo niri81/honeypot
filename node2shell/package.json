@@ -1,0 +1,13 @@
+{
+  "name": "node2shell-vuln-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vulnerable Express 5 fixture exposing Node's bundled Brotli decoder to clients (CVE-2026-111497)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "5.2.0",
+    "body-parser": "2.3.0"
+  }
+}
