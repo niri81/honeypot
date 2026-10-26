@@ -1,9 +1,9 @@
 services:
-  tcpdump:
+  tcpdump: &base_dump
     image: alpine:latest
     command: >
       sh -c "apk add --no-cache tcpdump &&
-             tcpdump -i any -w /captures/traffic_$$(date +%s).pcap"
+             tcpdump -i any -w /captures/${PREFIX}traffic_$$(date +%s).pcap"
     cap_drop:
       - ALL
     cap_add:
@@ -12,7 +12,7 @@ services:
     volumes:
       - /tmp/logs/tcpdump:/captures
     restart: unless-stopped
-    network_mode: "service:vulnerable"
+    network_mode: "service:tbd"
 
   falco:
     image: docker.io/falcosecurity/falco:latest
@@ -32,16 +32,22 @@ services:
       - /tmp/logs/falco:/var/log/falco
     restart: unless-stopped
 
-  vulnerable:
+  vulnerable-php:
     image: php:8.5.11-apache
     ports:
       - 0.0.0.0:80:80
     volumes:
       - ../app:/var/www/html
-    networks:
-      - honeypot-net
     restart: unless-stopped
+    networks:
+      - vulnerable-php
+
+  tcpdump-php:
+    <<: *base_dump
+    network_mode: service:vulnerable-php
+    environment:
+      PREFIX: php_
 
 networks:
-  honeypot-net:
+  vulnerable-php:
     driver: bridge
