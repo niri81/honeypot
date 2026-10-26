@@ -17,25 +17,42 @@ logger = logging.getLogger(__name__)
 
 
 def rotate(config: Config):
-    container_name = config.get("container_name")
-    if not container_name:
-        raise ValueError("Container name not defined in config")
-
-    container_id = container_get_id_by_name(container_name)
     log_path = construct_path(config.get("log_path"))
 
-    diff = container_diff_against_baseline(container_id, config.get("baseline"))
-    logger.info(f"Diff between container and baseline is: {json.dumps(diff)}")
-    if any(diff.values()):
-        notifier = Notifier(config.get("notifiers"))
-        notifier.notify("Diff Detected", json.dumps(diff))
+    for container in config.get("containers"):
+        container_name = container.get("name")
+        if not container_name:
+            raise ValueError(
+                f"Container name not defined in config, received container: {container}"
+            )
 
-        container_export_by_id(
-            container_id,
-            output_dir=log_path / "container_fs.tar",
+        logger.info(f"Now rotating container {container_name}")
+
+        container_id = container_get_id_by_name(container_name)
+
+        falco_log_path = construct_path(config.get("falco_log_path"))
+
+        diff = container_diff_against_baseline(
+            container_id, container.get("baseline", "")
         )
+        logger.info(f"Diff between container and baseline is: {json.dumps(diff)}")
+        if any(diff.values()) or falco_log_path.exists():
+            notifier = Notifier(config.get("notifiers"))
+            notifier.notify(
+                f"Diff Detected for Container {container_name}", json.dumps(diff)
+            )
 
-        save_logs_and_fs(log_path, construct_path(config.get("output_path")))
+            container_export_by_id(
+                container_id,
+                output_dir=log_path / f"container_{container_name}_fs.tar",
+            )
+
+            save_logs_and_fs(
+                log_path,
+                container.get("log_path_suffix"),
+                construct_path(config.get("output_path")),
+                container_name,
+            )
 
     compose_file_path = construct_path(config.get("compose_file_path"))
 

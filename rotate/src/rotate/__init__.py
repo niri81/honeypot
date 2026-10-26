@@ -1,7 +1,6 @@
 import logging
 
 from rotate.config import Config
-from rotate.notification import Notifier
 from rotate.rotate import rotate
 from rotate.utils import construct_path
 

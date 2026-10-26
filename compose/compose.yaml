@@ -2,14 +2,15 @@ x-tcpdump: &base_dump
   image: alpine:latest
   command: >
     sh -c "apk add --no-cache tcpdump &&
-      tcpdump -i any -w /captures/$${PREFIX}traffic_$$(date +%s).pcap"
+      mkdir /captures/$${PREFIX} &&
+      tcpdump -i any -w /captures/$${PREFIX}/traffic_$$(date +%s).pcap"
   cap_drop:
     - ALL
   cap_add:
     - NET_ADMIN
     - NET_RAW
   volumes:
-    - /tmp/logs/tcpdump:/captures
+    - /tmp/logs/:/captures
   restart: unless-stopped
   network_mode: "service:tbd"
 
@@ -46,13 +47,13 @@ services:
     <<: *base_dump
     network_mode: service:vulnerable-php
     environment:
-      PREFIX: php_
+      PREFIX: php
 
   vulnerable-node:
     build:
       context: ../node2shell
     ports:
-      - 0.0.0.0:8080:8080
+      - 0.0.0.0:8080:3000
     restart: unless-stopped
     networks:
       - vulnerable-node
@@ -61,7 +62,7 @@ services:
     <<: *base_dump
     network_mode: service:vulnerable-node
     environment:
-      PREFIX: node_
+      PREFIX: node
 
 networks:
   vulnerable-php:

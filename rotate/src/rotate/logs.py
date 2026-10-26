@@ -6,16 +6,24 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def save_logs_and_fs(log_path: Path, output_path: Path):
-    logger.info("Saving logs and fs")
+def save_logs_and_fs(
+    log_path: Path, log_path_suffix: str, output_path: Path, container_name: str
+):
+    logger.info(f"Saving logs and fs for container {container_name}")
     subprocess.run(
         [
             "tar",
             "czf",
-            output_path / (datetime.now().strftime("%y-%m-%dT%H-%M-%S") + ".tar.gz"),
+            output_path
+            / (
+                f"{container_name}_"
+                + datetime.now().strftime("%y-%m-%dT%H-%M-%S")
+                + ".tar.gz"
+            ),
             "--directory",
             log_path,
-            ".",
+            f"./{log_path_suffix}",
+            "./falco",
         ],
         check=True,
     )
