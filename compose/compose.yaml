@@ -38,7 +38,7 @@ services:
     ports:
       - 0.0.0.0:80:80
     volumes:
-      - ../app:/var/www/html
+      - ../php:/var/www/html
     restart: unless-stopped
     networks:
       - vulnerable-php
