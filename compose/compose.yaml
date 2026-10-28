@@ -10,7 +10,7 @@ x-tcpdump: &base_dump
     - NET_ADMIN
     - NET_RAW
   volumes:
-    - /tmp/logs/:/captures
+    - /var/log/honeypot/:/captures
   restart: unless-stopped
   network_mode: "service:tbd"
 
@@ -30,7 +30,7 @@ services:
       - /var/run/docker.sock:/host/var/run/docker.sock
       - ./rules.d:/etc/falco/rules.d:ro
       - ./falco.yaml:/etc/falco/falco.yaml:ro
-      - /tmp/logs/falco:/var/log/falco
+      - /var/log/honeypot/falco:/var/log/falco
     restart: unless-stopped
 
   vulnerable-php:
