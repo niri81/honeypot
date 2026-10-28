@@ -68,9 +68,11 @@ def rotate(config: Config):
             )
 
         if needs_save:
+            container_fs_file = f"container_{container_name}_fs.tar"
+
             container_export_by_id(
                 container_id,
-                output_dir=log_path / f"container_{container_name}_fs.tar",
+                output_dir=log_path / container_fs_file,
             )
 
             save_logs_and_fs(
@@ -78,6 +80,7 @@ def rotate(config: Config):
                 container.get("log_path_suffix"),
                 construct_path(config.get("output_path")),
                 container_name,
+                container_fs_file,
             )
 
     compose_file_path = construct_path(config.get("compose_file_path"))

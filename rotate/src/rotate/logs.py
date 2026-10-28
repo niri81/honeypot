@@ -7,7 +7,11 @@ logger = logging.getLogger(__name__)
 
 
 def save_logs_and_fs(
-    log_path: Path, log_path_suffix: str, output_path: Path, container_name: str
+    log_path: Path,
+    log_path_suffix: str,
+    output_path: Path,
+    container_name: str,
+    container_fs_file: str,
 ):
     logger.info(f"Saving logs and fs for container {container_name}")
     subprocess.run(
@@ -24,6 +28,7 @@ def save_logs_and_fs(
             log_path,
             f"./{log_path_suffix}",
             "./falco",
+            container_fs_file,
         ],
         check=True,
     )
