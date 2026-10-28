@@ -29,6 +29,8 @@ def save_logs_and_fs(
             f"./{log_path_suffix}",
             "./falco",
             container_fs_file,
+            "memory_dump.lime",
+            f"container_{container_name}.pid",
         ],
         check=True,
     )

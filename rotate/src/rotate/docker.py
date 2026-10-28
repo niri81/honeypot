@@ -69,6 +69,30 @@ def container_export_by_id(id: str, output_dir: Path):
     subprocess.run(["docker", "export", "-o", output_dir, id], check=True)
 
 
+def container_get_pid(
+    id: str, name: str, save: bool = False, log_path: Path | None = None
+) -> str:
+    logger.info(f"Retrieving container PID for container ID {id}: {name}")
+    pid = subprocess.run(
+        ["docker", "inspect", "-f", "{{.State.Pid}}", id],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    logger.info(f"PID is: {pid.stdout.strip()}")
+
+    if save:
+        if log_path:
+            with open(log_path / f"container_{name}.pid", "w") as f:
+                f.write(pid.stdout)
+        else:
+            logger.error(
+                f"Could not save container PID to file, since log path `{log_path}` was non-existent"
+            )
+
+    return pid.stdout
+
+
 def container_compose_down(compose_file_path: Path):
     logger.info(f"Running `docker compose down` in directory {compose_file_path}")
     subprocess.run(["docker", "compose", "down"], check=True, cwd=compose_file_path)

@@ -8,8 +8,10 @@ from rotate.docker import (
     container_diff_against_baseline,
     container_export_by_id,
     container_get_id_by_name,
+    container_get_pid,
 )
 from rotate.logs import delete_logs, save_logs_and_fs
+from rotate.memdump import dump_memory
 from rotate.notification import Notifier
 from rotate.utils import construct_path
 
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 def rotate(config: Config):
     log_path = construct_path(config.get("log_path"))
+    memdump_filename = "memory_dump.lime"
 
     for container in config.get("containers"):
         container_name = container.get("name")
@@ -70,10 +73,17 @@ def rotate(config: Config):
         if needs_save:
             container_fs_file = f"container_{container_name}_fs.tar"
 
+            container_get_pid(
+                container_id, container_name, save=True, log_path=log_path
+            )
+
             container_export_by_id(
                 container_id,
                 output_dir=log_path / container_fs_file,
             )
+
+            if not (log_path / memdump_filename).exists():
+                dump_memory(log_path, memdump_filename)
 
             save_logs_and_fs(
                 log_path,
